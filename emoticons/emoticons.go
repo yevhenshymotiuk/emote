@@ -34,7 +34,11 @@ func New() (*App, error) {
 }
 
 func (a *App) Emote(name string, dest string) {
-	emoticon := a.Config.Emoticon[name]
+	emoticon, prs := a.Config.Emoticon[name]
+	if !prs {
+		fmt.Fprintf(a.Out, "There is no %s emote in the list\n", name)
+		return
+	}
 
 	switch dest {
 	case "clipboard":
