@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
+	"github.com/carolynvs/emote/config"
 	"github.com/carolynvs/emote/emoticons"
 	"github.com/spf13/cobra"
 )
@@ -35,6 +37,19 @@ func buildEmoteCommand(app *emoticons.App) *cobra.Command {
 	}
 
 	emote.Flags().StringVar(&dest, "dest", "clipboard", "Where to send your emoticon")
+	emote.AddCommand(buildConfigCommand())
 
 	return emote
+}
+
+func buildConfigCommand() *cobra.Command {
+	config := &cobra.Command{
+		Use: "config",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("Config file is:", config.File())
+		},
+		Args: cobra.ExactArgs(0),
+	}
+
+	return config
 }
