@@ -37,16 +37,16 @@ func buildEmoteCommand(app *emoticons.App) *cobra.Command {
 	}
 
 	emote.Flags().StringVar(&dest, "dest", "clipboard", "Where to send your emoticon")
-	emote.AddCommand(buildConfigCommand())
+	emote.AddCommand(buildConfigCommand(app))
 
 	return emote
 }
 
-func buildConfigCommand() *cobra.Command {
+func buildConfigCommand(app *emoticons.App) *cobra.Command {
 	config := &cobra.Command{
 		Use: "config",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Config file is:", config.File())
+			fmt.Println("Config file is", config.File(app.Viper))
 		},
 		Args: cobra.ExactArgs(0),
 	}

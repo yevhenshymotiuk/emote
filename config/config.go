@@ -2,7 +2,6 @@ package config
 
 import (
 	"os"
-	"path"
 
 	"github.com/pelletier/go-toml"
 	"github.com/spf13/viper"
@@ -13,27 +12,17 @@ type Config struct {
 	Emoticon map[string]string `toml:"emoticon"`
 }
 
-var (
-	configPath string = os.Getenv("HOME")
-	configName string = "emote"
-	configFile string = path.Join(configPath, configName+".toml")
-)
-
 type configAlreadyExistsError struct{}
 
 func (e *configAlreadyExistsError) Error() string {
 	return "config file already exists"
 }
 
-func Load() (*Config, error) {
-	v := viper.New()
-	v.SetConfigName(configName)
-	v.AddConfigPath(configPath)
-
+func Load(v *viper.Viper) (*Config, error) {
 	err := v.ReadInConfig()
 	if err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			if _, err = Create(); err != nil {
+			if _, err = Create(v, Config{Dest: "clipboard"}); err != nil {
 				return nil, err
 			}
 			if err = v.ReadInConfig(); err != nil {
@@ -49,20 +38,16 @@ func Load() (*Config, error) {
 	return c, err
 }
 
-func Create() (*Config, error) {
-	v := viper.New()
-
+func Create(v *viper.Viper, c Config) (*Config, error) {
 	if err := v.ReadInConfig(); err == nil {
 		return nil, &configAlreadyExistsError{}
 	}
 
-	f, err := os.Create(configFile)
+	f, err := os.Create(v.ConfigFileUsed())
 	defer f.Close()
 	if err != nil {
 		return nil, err
 	}
-
-	c := Config{Dest: "clipboard"}
 
 	cfgToml, err := toml.Marshal(c)
 	if err != nil {
@@ -77,6 +62,6 @@ func Create() (*Config, error) {
 	return &c, nil
 }
 
-func File() string {
-	return configFile
+func File(v *viper.Viper) string {
+	return v.ConfigFileUsed()
 }
