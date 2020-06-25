@@ -5,6 +5,8 @@ import (
 	"io"
 	"os"
 	"path"
+	"sort"
+	"strings"
 
 	"github.com/atotto/clipboard"
 	"github.com/carolynvs/emote/config"
@@ -46,5 +48,27 @@ func (a *App) Emote(name string, dest string) {
 		fmt.Fprintf(a.Out, "'%s' was copied to the clipboard\n", emoticon)
 	default:
 		fmt.Fprintln(a.Out, emoticon)
+	}
+}
+
+func (a *App) PrintEmotesList() {
+	emoticons := a.Config.Emoticon
+
+	var maxNameLength int
+
+	var keys []string
+	for k := range emoticons {
+		keyLen := len(k)
+		if keyLen > maxNameLength {
+			maxNameLength = keyLen
+		}
+
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		space := strings.Repeat(" ", maxNameLength - len(k))
+		fmt.Fprintln(a.Out, k, space, emoticons[k])
 	}
 }

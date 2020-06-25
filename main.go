@@ -37,7 +37,9 @@ func buildEmoteCommand(app *emoticons.App) *cobra.Command {
 	}
 
 	emote.Flags().StringVar(&dest, "dest", "clipboard", "Where to send your emoticon")
+
 	emote.AddCommand(buildConfigCommand(app))
+	emote.AddCommand(buildListCommand(app))
 
 	return emote
 }
@@ -52,4 +54,16 @@ func buildConfigCommand(app *emoticons.App) *cobra.Command {
 	}
 
 	return config
+}
+
+func buildListCommand(app *emoticons.App) *cobra.Command {
+	list := &cobra.Command{
+		Use: "list",
+		Run: func(cmd *cobra.Command, args []string) {
+			app.PrintEmotesList()
+		},
+		Args: cobra.ExactArgs(0),
+	}
+
+	return list
 }
