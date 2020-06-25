@@ -32,7 +32,7 @@ func (a *App) Emote(name string, dest string) {
 	switch dest {
 	case "clipboard":
 		clipboard.WriteAll(emoticon)
-		fmt.Fprintf(a.Out, emoticon, "was copied to the clipboard")
+		fmt.Fprintf(a.Out, "'%s' was copied to the clipboard\n", emoticon)
 	default:
 		fmt.Fprintln(a.Out, emoticon)
 	}
