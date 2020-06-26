@@ -13,12 +13,14 @@ import (
 	"github.com/spf13/viper"
 )
 
+// App contains main dependencies of the application
 type App struct {
 	Out    io.Writer
 	Config *config.Config
 	Viper  *viper.Viper
 }
 
+// New constructs new instance of the application
 func New() (*App, error) {
 	v := viper.New()
 	v.SetConfigFile(path.Join(os.Getenv("HOME"), "emote.toml"))
@@ -35,6 +37,7 @@ func New() (*App, error) {
 	return a, nil
 }
 
+// Emote sends chosen emoticon to the destination
 func (a *App) Emote(name string, dest string) {
 	emoticon, prs := a.Config.Emoticon[name]
 	if !prs {
@@ -51,6 +54,7 @@ func (a *App) Emote(name string, dest string) {
 	}
 }
 
+// PrintEmotesList prints list of emotes
 func (a *App) PrintEmotesList() {
 	emoticons := a.Config.Emoticon
 
