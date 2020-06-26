@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"os"
 
 	"github.com/pelletier/go-toml"
@@ -47,10 +48,15 @@ func Create(v *viper.Viper, c Config) (*Config, error) {
 	}
 
 	f, err := os.Create(v.ConfigFileUsed())
-	defer f.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer func() {
+		err = f.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	cfgToml, err := toml.Marshal(c)
 	if err != nil {

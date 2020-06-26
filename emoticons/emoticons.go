@@ -36,26 +36,36 @@ func New() (*App, error) {
 	}
 	return a, nil
 }
-
 // Emote sends chosen emoticon to the destination
-func (a *App) Emote(name string, dest string) {
+func (a *App) Emote(name string, dest string) error {
 	emoticon, prs := a.Config.Emoticon[name]
 	if !prs {
-		fmt.Fprintf(a.Out, "There is no %s emote in the list\n", name)
-		return
+		_, err := fmt.Fprintf(a.Out, "There is no %s emote in the list\n", name)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
 
 	switch dest {
 	case "clipboard":
-		clipboard.WriteAll(emoticon)
-		fmt.Fprintf(a.Out, "'%s' was copied to the clipboard\n", emoticon)
+		err := clipboard.WriteAll(emoticon)
+		_, err = fmt.Fprintf(a.Out, "'%s' was copied to the clipboard\n", emoticon)
+		if err != nil {
+			return err
+		}
 	default:
-		fmt.Fprintln(a.Out, emoticon)
+		_, err := fmt.Fprintln(a.Out, emoticon)
+		if err != nil {
+			return err
+		}
 	}
+
+	return nil
 }
 
 // PrintEmotesList prints list of emotes
-func (a *App) PrintEmotesList() {
+func (a *App) PrintEmotesList() error {
 	emoticons := a.Config.Emoticon
 
 	var maxNameLength int
@@ -73,6 +83,11 @@ func (a *App) PrintEmotesList() {
 
 	for _, k := range keys {
 		space := strings.Repeat(" ", maxNameLength - len(k))
-		fmt.Fprintln(a.Out, k, space, emoticons[k])
+		_, err := fmt.Fprintln(a.Out, k, space, emoticons[k])
+		if err != nil {
+			return err
+		}
 	}
+
+	return nil
 }

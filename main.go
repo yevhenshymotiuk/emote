@@ -15,33 +15,41 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	cmd := buildEmoteCommand(app)
+	cmd, err := buildEmoteCommand(app)
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
 
-func buildEmoteCommand(app *emoticons.App) *cobra.Command {
+func buildEmoteCommand(app *emoticons.App) (emote *cobra.Command, err error) {
 	var dest string
 
-	emote := &cobra.Command{
+	emote = &cobra.Command{
 		Use: "emote",
 		PreRun: func(cmd *cobra.Command, args []string) {
 			app.Out = cmd.OutOrStdout()
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			emoticonName := args[0]
-			app.Emote(emoticonName, dest)
+			err = app.Emote(emoticonName, dest)
 		},
 		Args: cobra.ExactArgs(1),
+	}
+	if err != nil {
+		return
 	}
 
 	emote.Flags().StringVar(&dest, "dest", "clipboard", "Where to send your emoticon")
 
 	emote.AddCommand(buildConfigCommand(app))
-	emote.AddCommand(buildListCommand(app))
 
-	return emote
+	listCommand, err := buildListCommand(app)
+	if err != nil {
+		return
+	}
+	emote.AddCommand(listCommand)
+
+	return
 }
 
 func buildConfigCommand(app *emoticons.App) *cobra.Command {
@@ -56,14 +64,14 @@ func buildConfigCommand(app *emoticons.App) *cobra.Command {
 	return config
 }
 
-func buildListCommand(app *emoticons.App) *cobra.Command {
-	list := &cobra.Command{
+func buildListCommand(app *emoticons.App) (list *cobra.Command, err error) {
+	list = &cobra.Command{
 		Use: "list",
 		Run: func(cmd *cobra.Command, args []string) {
-			app.PrintEmotesList()
+			err = app.PrintEmotesList()
 		},
 		Args: cobra.ExactArgs(0),
 	}
 
-	return list
+	return
 }
